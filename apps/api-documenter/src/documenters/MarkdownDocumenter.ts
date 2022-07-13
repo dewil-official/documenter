@@ -1067,16 +1067,7 @@ export class MarkdownDocumenter {
   }
 
   private _writeBreadcrumb(output: DocSection, apiItem: ApiItem): void {
-    output.appendNodeInParagraph(
-      new DocLinkTag({
-        configuration: this._tsdocConfiguration,
-        tagName: '@link',
-        linkText: 'Home',
-        urlDestination: this._getLinkFilenameForApiItem(this._apiModel)
-      })
-    );
-
-    for (const hierarchyItem of apiItem.getHierarchy()) {
+    apiItem.getHierarchy().forEach((hierarchyItem, index) => {
       switch (hierarchyItem.kind) {
         case ApiItemKind.Model:
         case ApiItemKind.EntryPoint:
@@ -1085,20 +1076,24 @@ export class MarkdownDocumenter {
           // this may change in the future.
           break;
         default:
-          output.appendNodesInParagraph([
-            new DocPlainText({
-              configuration: this._tsdocConfiguration,
-              text: ' > '
-            }),
+          if (output.nodes.length > 0) {
+            output.appendNodeInParagraph(
+              new DocPlainText({
+                configuration: this._tsdocConfiguration,
+                text: ' > '
+              })
+            );
+          }
+          output.appendNodeInParagraph(
             new DocLinkTag({
               configuration: this._tsdocConfiguration,
               tagName: '@link',
               linkText: hierarchyItem.displayName,
               urlDestination: this._getLinkFilenameForApiItem(hierarchyItem)
             })
-          ]);
+          );
       }
-    }
+    });
   }
 
   private _writeBetaWarning(output: DocSection): void {
@@ -1137,7 +1132,8 @@ export class MarkdownDocumenter {
 
   private _getFilenameForApiItem(apiItem: ApiItem): string {
     if (apiItem.kind === ApiItemKind.Model) {
-      return 'index.md';
+      return '_packages.md';
+      // return '_.md';
     }
 
     let baseName: string = '';
@@ -1158,17 +1154,41 @@ export class MarkdownDocumenter {
         case ApiItemKind.EnumMember:
           break;
         case ApiItemKind.Package:
-          baseName = Utilities.getSafeFilenameForName(PackageName.getUnscopedName(hierarchyItem.displayName));
+          const apiItemHierarchy = apiItem.getHierarchy();
+          if (apiItemHierarchy[apiItemHierarchy.length - 1].kind === ApiItemKind.Package) {
+            baseName = 'index';
+          }
+          // Don't add the package name to the filename of others
+
+          // if (apiItem.getHierarchy().length > 1) {
+          //   // Don't add the package name for other files
+          // } else {
+          //   baseName = 'index';
+          // }
+
+          // baseName = Utilities.getSafeFilenameForName(PackageName.getUnscopedName(hierarchyItem.displayName));
+          // baseName = 'plugin-sdk';
+          // baseName = 'index.md';
           break;
         default:
-          baseName += '.' + qualifiedName;
+          baseName.length > 0 ? (baseName += '.' + qualifiedName) : (baseName = qualifiedName);
       }
     }
     return baseName + '.md';
   }
 
   private _getLinkFilenameForApiItem(apiItem: ApiItem): string {
-    return './' + this._getFilenameForApiItem(apiItem);
+    let filename: string = this._getFilenameForApiItem(apiItem);
+
+    // Fix for `/index` link, which doesn't work in Docusaurus
+    if (filename === 'index.md') return './';
+
+    // Docusaurus removes `.md` extensions in URLs, so we don't need them
+    if (filename.endsWith('.md')) {
+      const endingPos: number = filename.indexOf('.md');
+      filename = filename.substring(0, endingPos);
+    }
+    return './' + filename;
   }
 
   private _deleteOldOutputFiles(): void {
