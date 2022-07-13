@@ -63,6 +63,8 @@ import {
 import { DocumenterConfig } from './DocumenterConfig';
 import { MarkdownDocumenterAccessor } from '../plugin/MarkdownDocumenterAccessor';
 
+const PACKAGE_NAME = '@remnote/plugin-sdk';
+
 export interface IMarkdownDocumenterOptions {
   apiModel: ApiModel;
   documenterConfig: DocumenterConfig | undefined;
@@ -153,7 +155,7 @@ export class MarkdownDocumenter {
         break;
       case ApiItemKind.Package:
         console.log(`Writing ${apiItem.displayName} package`);
-        const unscopedPackageName: string = PackageName.getUnscopedName(apiItem.displayName);
+        const unscopedPackageName: string = PACKAGE_NAME;
         output.appendNode(new DocHeading({ configuration, title: `${unscopedPackageName} package` }));
         break;
       case ApiItemKind.Property:
@@ -1084,11 +1086,13 @@ export class MarkdownDocumenter {
               })
             );
           }
+          let displayName: string = hierarchyItem.displayName;
+          if (hierarchyItem.kind === ApiItemKind.Package) displayName = PACKAGE_NAME;
           output.appendNodeInParagraph(
             new DocLinkTag({
               configuration: this._tsdocConfiguration,
               tagName: '@link',
-              linkText: hierarchyItem.displayName,
+              linkText: displayName,
               urlDestination: this._getLinkFilenameForApiItem(hierarchyItem)
             })
           );
@@ -1166,7 +1170,7 @@ export class MarkdownDocumenter {
           //   baseName = 'index';
           // }
 
-          // baseName = Utilities.getSafeFilenameForName(PackageName.getUnscopedName(hierarchyItem.displayName));
+          // baseName = Utilities.getSafeFilenameForName(PACKAGE_NAME);
           // baseName = 'plugin-sdk';
           // baseName = 'index.md';
           break;
