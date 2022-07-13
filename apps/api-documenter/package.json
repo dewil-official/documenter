@@ -1,6 +1,6 @@
 {
   "name": "remnote-custom-api-documenter",
-  "version": "7.18.2",
+  "version": "7.18.3",
   "description": "Read JSON files from api-extractor, generate documentation pages",
   "repository": {
     "type": "git",
@@ -20,18 +20,18 @@
   "main": "lib/index.js",
   "typings": "dist/rollup.d.ts",
   "dependencies": {
-    "@microsoft/api-extractor-model": "workspace:*",
+    "@microsoft/api-extractor-model": "7.21.0",
     "@microsoft/tsdoc": "0.14.1",
-    "@rushstack/node-core-library": "workspace:*",
-    "@rushstack/ts-command-line": "workspace:*",
+    "@rushstack/node-core-library": "3.49.0",
+    "@rushstack/ts-command-line": "4.12.1",
     "colors": "~1.2.1",
     "js-yaml": "~3.13.1",
     "resolve": "~1.17.0"
   },
   "devDependencies": {
-    "@rushstack/eslint-config": "workspace:*",
-    "@rushstack/heft": "workspace:*",
-    "@rushstack/heft-node-rig": "workspace:*",
+    "@rushstack/eslint-config": "2.6.2",
+    "@rushstack/heft": "0.46.3",
+    "@rushstack/heft-node-rig": "1.9.19",
     "@types/heft-jest": "1.0.1",
     "@types/js-yaml": "3.12.1",
     "@types/node": "12.20.24",
